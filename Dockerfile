@@ -1,14 +1,27 @@
-# Usa immagine Node.js con Chrome pre-installato
-FROM ghcr.io/puppeteer/puppeteer:21.6.1
+# Usa Node.js Alpine (molto più leggero)
+FROM node:18-alpine
 
-# Imposta working directory
+# Installa dipendenze per Chromium
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Variabile ambiente per Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Working directory
 WORKDIR /app
 
 # Copia package files
 COPY package*.json ./
 
 # Installa dipendenze
-RUN npm install --production
+RUN npm install --production --no-optional
 
 # Copia codice
 COPY . .
